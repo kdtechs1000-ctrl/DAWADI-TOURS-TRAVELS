@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, User, Mail, Trash2, Clock, Loader2, RefreshCw } from 'lucide-react';
+import { Calendar, User, Mail, Trash2, Clock, Loader2, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
 
 export default function MyBookings() {
@@ -165,16 +164,20 @@ export default function MyBookings() {
         </div>
       )}
 
-      {/* Cancellation Confirmation Dialog */}
-      <Dialog open={!!cancelTargetId} onOpenChange={() => setCancelTargetId(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center text-xl font-bold text-slate-900">
+      {/* Confirmation Modal */}
+      {cancelTargetId && (
+        <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-xl border border-slate-200 relative">
+            <button
+              onClick={() => setCancelTargetId(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <h3 className="text-xl font-bold text-center text-slate-900">
               Cancel Booking Request?
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 text-center p-2">
-            <p className="text-xs text-slate-600">
+            </h3>
+            <p className="text-xs text-center text-slate-600">
               Are you sure you want to remove booking <strong>#BK-{cancelTargetId}</strong>? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-center pt-2">
@@ -186,8 +189,8 @@ export default function MyBookings() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
     </div>
   );
 }
