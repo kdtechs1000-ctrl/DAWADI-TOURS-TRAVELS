@@ -9,11 +9,20 @@ export default function MyBookings() {
   const [cancelTargetId, setCancelTargetId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Safely format date into Kathmandu Timezone
+  // Safely format UTC string into Kathmandu Timezone
   const formatKathmanduTime = (dateStr) => {
     if (!dateStr) return 'Recently booked';
     try {
-      return new Date(dateStr).toLocaleString('en-US', {
+      // 1. Convert space separator to ISO standard 'T'
+      let isoString = String(dateStr).trim().replace(' ', 'T');
+
+      // 2. Append 'Z' to treat as UTC if offset marker is absent
+      if (!isoString.endsWith('Z') && !isoString.includes('+')) {
+        isoString += 'Z';
+      }
+
+      // 3. Format into local Kathmandu time (+5:45)
+      return new Date(isoString).toLocaleString('en-US', {
         timeZone: 'Asia/Kathmandu',
         dateStyle: 'medium',
         timeStyle: 'short',
