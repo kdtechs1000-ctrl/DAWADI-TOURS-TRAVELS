@@ -25,7 +25,7 @@ export default function Footer() {
     },
     { 
       icon: MessageCircle, 
-      href: `https://wa.me/${9803619762}?text=${Hello}`, 
+      href: `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`, 
       label: 'WhatsApp' 
     },
   ];

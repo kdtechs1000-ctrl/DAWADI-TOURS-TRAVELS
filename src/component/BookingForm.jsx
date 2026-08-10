@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { Calendar, User, Mail, Phone, Users, CheckCircle2, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Phone, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
-import { addBooking } from '@/lib/storage';
-import { supabase } from '../supabaseClient';
+import { supabase } from '@/lib/supabase'; // Import Supabase client
 
 export default function BookingForm({ initialService = null, isOpen, onClose }) {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    serviceName: initialService ? (initialService.title || initialService.name) : '',
-    serviceType: initialService ? (initialService.category || 'Tour Package') : 'Tour Package',
+    serviceName: '',
+    serviceType: 'Tour Package',
     travelDate: '',
     travelers: '2',
     specialRequests: '',
@@ -19,6 +18,18 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
 
   const [errors, setErrors] = useState({});
   const [confirmedBooking, setConfirmedBooking] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Sync state when initialService changes or dialog opens
+  useEffect(() => {
+    if (initialService) {
+      setFormData((prev) => ({
+        ...prev,
+        serviceName: initialService.title || initialService.name || '',
+        serviceType: initialService.category || 'Tour Package',
+      }));
+    }
+  }, [initialService, isOpen]);
 
   const validate = () => {
     const errs = {};
@@ -31,20 +42,62 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
+    setLoading(true);
+
     try {
-      const created = addBooking(formData);
-      setConfirmedBooking(created);
+      // Insert form data into Supabase "bookings" table
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([
+          {
+            full_name: formData.fullName,
+            email: formData.email,
+            phone: formData.phone,
+            service_name: formData.serviceName,
+            service_type: formData.serviceType,
+            travel_date: formData.travelDate,
+            travelers: formData.travelers,
+            special_requests: formData.specialRequests,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Transform backend response for rendering confirmation
+      setConfirmedBooking({
+        id: data.id,
+        fullName: data.full_name,
+        email: data.email,
+        phone: data.phone,
+        serviceName: data.service_name,
+        travelDate: data.travel_date,
+        travelers: data.travelers,
+      });
     } catch (err) {
-      alert('Failed to save booking');
+      alert('Failed to save booking: ' + (err.message || 'Unknown error occurred'));
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDone = () => {
     setConfirmedBooking(null);
+    setFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      serviceName: '',
+      serviceType: 'Tour Package',
+      travelDate: '',
+      travelers: '2',
+      specialRequests: '',
+    });
     onClose();
   };
 
@@ -58,7 +111,7 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
           <h2 className="text-2xl font-black text-slate-900">Booking Requested!</h2>
           <p className="text-xs text-slate-500">Your reservation code is:</p>
           <div className="bg-slate-100 p-3 rounded-xl font-mono text-lg font-bold text-emerald-900 tracking-wider">
-            {confirmedBooking.id}
+            #BK-{confirmedBooking.id}
           </div>
           <div className="text-xs text-slate-600 bg-emerald-50 p-4 rounded-xl border border-emerald-100 space-y-1 text-left">
             <p><strong>Name:</strong> {confirmedBooking.fullName}</p>
@@ -174,8 +227,15 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
               />
             </div>
 
-            <Button type="submit" className="w-full h-11 text-sm font-bold mt-2">
-              Confirm Reservation Request
+            <Button type="submit" disabled={loading} className="w-full h-11 text-sm font-bold mt-2 flex items-center justify-center gap-2">
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving Reservation...
+                </>
+              ) : (
+                'Confirm Reservation Request'
+              )}
             </Button>
           </form>
         </div>

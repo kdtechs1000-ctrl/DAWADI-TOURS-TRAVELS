@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Hero from '@/component/Hero';
-import TourCard from '@/component/TourCard';
-import ReviewCard from '@/component/ReviewCard';
-import BookingForm from '@/component/BookingForm';
-import { tours } from '@/data/tours';
-import { reviews } from '@/data/reviews';
 import { 
   ShieldCheck, Award, HeartHandshake, Headphones, 
   ArrowRight, Compass, Hotel, Mountain, Car, CheckCircle, Sparkles 
 } from 'lucide-react';
+
+import Hero from '@/component/Hero';
+import TourCard from '@/component/TourCard';
+import ReviewCard from '@/component/ReviewCard';
+import BookingForm from '@/component/BookingForm';
+
+import { supabase } from '@/lib/supabase';
+import { tours as staticTours } from '@/data/tours';
+import { reviews } from '@/data/reviews';
 import { Button } from '@/components/ui/button';
 
 // Animation Variants
@@ -28,8 +31,34 @@ const staggerContainer = {
 };
 
 export default function Home() {
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+
+  // Fetch tours from Supabase SQL database (fallback to local data if empty)
+  useEffect(() => {
+    fetchToursFromDatabase();
+  }, []);
+
+  const fetchToursFromDatabase = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tours')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        setTours(data);
+      } else {
+        setTours(staticTours); // Use static data if Supabase table is empty or error occurs
+      }
+    } catch (err) {
+      setTours(staticTours);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBookNow = (service) => {
     setSelectedService(service);

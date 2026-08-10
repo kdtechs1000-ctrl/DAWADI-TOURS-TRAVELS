@@ -15,6 +15,8 @@ import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import MyBookings from '@/pages/MyBookings';
 import NotFound from '@/pages/NotFound';
+import AdminPage from '@/pages/AdminPage';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -34,6 +36,10 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/my-bookings" element={<MyBookings />} />
+            
+            {/* Admin Route */}
+            <Route path="/admin" element={<AdminPage />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
