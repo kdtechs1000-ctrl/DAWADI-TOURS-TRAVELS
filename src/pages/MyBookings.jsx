@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, User, Mail, Trash2, Clock, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/lib/supabase';
 
 export default function MyBookings() {
@@ -10,17 +10,29 @@ export default function MyBookings() {
   const [cancelTargetId, setCancelTargetId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch bookings and merge localStorage with Supabase safely
+  // Safely format date into Kathmandu Timezone
+  const formatKathmanduTime = (dateStr) => {
+    if (!dateStr) return 'Recently booked';
+    try {
+      return new Date(dateStr).toLocaleString('en-US', {
+        timeZone: 'Asia/Kathmandu',
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      });
+    } catch (err) {
+      return 'Date unavailable';
+    }
+  };
+
+  // Fetch bookings and merge localStorage with Supabase
   const fetchBookings = async () => {
     setLoading(true);
 
-    // 1. Load cached data from localStorage for instant display
     const localData = JSON.parse(localStorage.getItem('saved_bookings') || '[]');
     if (localData.length > 0) {
       setBookingList(localData);
     }
 
-    // 2. Fetch fresh records from Supabase
     try {
       const { data: supabaseData, error } = await supabase
         .from('bookings')
@@ -30,10 +42,9 @@ export default function MyBookings() {
       if (error) throw error;
 
       if (supabaseData) {
-        // Merge Supabase and localStorage using Map to prevent duplicate IDs
         const combinedMap = new Map();
 
-        // Add remote records first
+        // Remote records first
         supabaseData.forEach((item) => {
           if (item.id) combinedMap.set(String(item.id), item);
         });
@@ -65,7 +76,6 @@ export default function MyBookings() {
     if (!cancelTargetId) return;
 
     try {
-      // 1. Remove record from Supabase
       const { error } = await supabase
         .from('bookings')
         .delete()
@@ -73,7 +83,6 @@ export default function MyBookings() {
 
       if (error) console.warn('Supabase record delete error:', error.message);
 
-      // 2. Remove record from local React state and update localStorage
       const updatedList = bookingList.filter((b) => String(b.id) !== String(cancelTargetId));
       setBookingList(updatedList);
       localStorage.setItem('saved_bookings', JSON.stringify(updatedList));
@@ -109,15 +118,15 @@ export default function MyBookings() {
         </div>
       ) : bookingList.length > 0 ? (
         <div className="space-y-4">
-          {bookingList.map((b) => (
+          {bookingList.map((b, index) => (
             <div
-              key={b.id || Math.random()}
+              key={b.id || `booking-${index}`}
               className="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs"
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-bold text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    #BK-{b.id}
+                    #BK-{b.id || 'TEMP'}
                   </span>
                   <Badge variant="secondary">{b.status || 'Confirmed'}</Badge>
                 </div>
@@ -129,16 +138,10 @@ export default function MyBookings() {
                   <span className="flex items-center gap-1">
                     <Mail className="h-3.5 w-3.5 text-emerald-700" /> {b.email_address || b.email}
                   </span>
-                  {b.created_at && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5 text-emerald-700" />
-                      {new Date(b.created_at).toLocaleString('en-US', {
-                        timeZone: 'Asia/Kathmandu',
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })}
-                    </span>
-                  )}
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5 text-emerald-700" />
+                    {formatKathmanduTime(b.created_at)}
+                  </span>
                 </div>
               </div>
 
@@ -164,20 +167,26 @@ export default function MyBookings() {
 
       {/* Cancellation Confirmation Dialog */}
       <Dialog open={!!cancelTargetId} onOpenChange={() => setCancelTargetId(null)}>
-        <div className="space-y-4 text-center p-2">
-          <h3 className="text-xl font-bold text-slate-900">Cancel Booking Request?</h3>
-          <p className="text-xs text-slate-600">
-            Are you sure you want to remove booking <strong>#BK-{cancelTargetId}</strong>? This action cannot be undone.
-          </p>
-          <div className="flex gap-3 justify-center pt-2">
-            <Button variant="outline" onClick={() => setCancelTargetId(null)}>
-              Keep Booking
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmCancel}>
-              Yes, Cancel
-            </Button>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold text-slate-900">
+              Cancel Booking Request?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-center p-2">
+            <p className="text-xs text-slate-600">
+              Are you sure you want to remove booking <strong>#BK-{cancelTargetId}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-center pt-2">
+              <Button variant="outline" onClick={() => setCancelTargetId(null)}>
+                Keep Booking
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmCancel}>
+                Yes, Cancel
+              </Button>
+            </div>
           </div>
-        </div>
+        </DialogContent>
       </Dialog>
     </div>
   );
