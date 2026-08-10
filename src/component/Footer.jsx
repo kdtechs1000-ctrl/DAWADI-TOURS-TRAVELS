@@ -28,7 +28,7 @@ export default function Footer() {
               <a href="#" className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 transition-colors">
                 <Youtube className="h-4 w-4" />
               </a>
-              <a href="https://wa.me/9779851000000" className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 transition-colors">
+              <a href="https://wa.me/9779803619762" className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-emerald-400 transition-colors">
                 <MessageCircle className="h-4 w-4" />
               </a>
             </div>
@@ -68,7 +68,7 @@ export default function Footer() {
             <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4">Head Office</h4>
             <div className="flex items-start gap-3 text-xs text-slate-400">
               <MapPin className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-              <span>Thamel Marg, Ward 26, Kathmandu, Nepal</span>
+              <span>Purano Naikap, Ward 13, Kathmandu, Nepal</span>
             </div>
             <div className="flex items-center gap-3 text-xs text-slate-400">
               <Phone className="h-4 w-4 text-emerald-500 shrink-0" />

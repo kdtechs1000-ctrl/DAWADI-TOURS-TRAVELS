@@ -25,7 +25,7 @@ export default function Contact() {
           <div className="space-y-4 text-xs">
             <div className="flex items-start gap-3">
               <MapPin className="h-5 w-5 text-emerald-400 shrink-0" />
-              <span>Thamel Marg, Ward 26, Kathmandu, Nepal</span>
+              <span>Purano Naikap, Ward 13, Kathmandu, Nepal</span>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="h-5 w-5 text-emerald-400 shrink-0" />
@@ -42,7 +42,7 @@ export default function Contact() {
           </div>
 
           <div className="pt-4 border-t border-emerald-800/80">
-            <a href="https://wa.me/9779851000000" target="_blank" rel="noreferrer">
+            <a href="https://wa.me/9779803619762" target="_blank" rel="noreferrer">
               <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold gap-2">
                 <MessageCircle className="h-4 w-4" />
                 Chat on WhatsApp

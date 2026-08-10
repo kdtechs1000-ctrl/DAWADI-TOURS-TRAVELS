@@ -10,7 +10,7 @@ export default function Hero() {
       {/* Background Image Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&auto=format&fit=crop&q=80"
+          src="https://t4.ftcdn.net/jpg/03/10/24/63/360_F_310246341_869grfwR1b87MN3qyFPe6yZZIRC83X31.jpg"
           alt="Nepal Himalayas"
           className="w-full h-full object-cover object-center opacity-40 scale-105 transition-transform duration-10000"
         />

@@ -7,7 +7,7 @@ export const hotels = [
     guestRating: 4.8,
     reviewsCount: 340,
     pricePerNight: 8500,
-    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=80',
+    image: 'https://cdn.esewahotels.com/web/blogs/1763118844-1949600400.jpg',
     description: 'A quiet oasis in bustling Thamel featuring traditional Newari brick architecture, lush inner courtyards, and world-class spa treatment.',
     facilities: ['Wi-Fi', 'Parking', 'Restaurant', 'Swimming Pool', 'Breakfast', 'Airport Pickup'],
     rooms: [
@@ -24,7 +24,7 @@ export const hotels = [
     guestRating: 4.9,
     reviewsCount: 420,
     pricePerNight: 6500,
-    image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&auto=format&fit=crop&q=80',
+    image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/8f/ce/33/mountain-glory-forest.jpg?w=900&h=500&s=1',
     description: 'Situated right on Fewa Lake with uninterrupted views of Mt. Fishtail. Features outdoor pool, waterfront dining, and kayak rentals.',
     facilities: ['Wi-Fi', 'Parking', 'Restaurant', 'Swimming Pool', 'Breakfast'],
     rooms: [
@@ -40,7 +40,7 @@ export const hotels = [
     guestRating: 4.7,
     reviewsCount: 190,
     pricePerNight: 7200,
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop&q=80',
+    image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/43/f6/a9/chitwan-jungle-lodge.jpg?w=1200&h=-1&s=1',
     description: 'Eco-friendly jungle lodge on the bank of Rapti River. Enjoy dinner watching rhinos drink across the river.',
     facilities: ['Wi-Fi', 'Parking', 'Restaurant', 'Swimming Pool', 'Breakfast', 'Airport Pickup'],
     rooms: [
@@ -56,7 +56,7 @@ export const hotels = [
     guestRating: 4.5,
     reviewsCount: 110,
     pricePerNight: 4500,
-    image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&auto=format&fit=crop&q=80',
+    image: 'https://www.lumbiniheritagenepal.com.np/images/slideshow/TDCZE-photo.jpg',
     description: 'Tranquil retreat located just 5 minutes from the Sacred Garden. Peaceful gardens, meditation pavilion, and vegetarian dining.',
     facilities: ['Wi-Fi', 'Parking', 'Restaurant', 'Breakfast'],
     rooms: [
@@ -72,7 +72,7 @@ export const hotels = [
     guestRating: 4.8,
     reviewsCount: 260,
     pricePerNight: 5800,
-    image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&auto=format&fit=crop&q=80',
+    image: 'https://www.pelago.com/img/products/NP-Nepal/a-lavish-night-at-nagarkot-hill-station-with-sunrise-view-and-luxury-stay/c60a39be-811f-4c29-9021-9d2a89c35963_a-lavish-night-at-nagarkot-hill-station-with-sunrise-view-and-luxury-stay.jpg',
     description: 'Perched at 2,100 meters elevation. Watch sunrise over 8 Himalayan mountain ranges directly from your private bedroom glass window.',
     facilities: ['Wi-Fi', 'Parking', 'Restaurant', 'Breakfast'],
     rooms: [
@@ -88,7 +88,7 @@ export const hotels = [
     guestRating: 4.6,
     reviewsCount: 85,
     pricePerNight: 5200,
-    image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&auto=format&fit=crop&q=80',
+    image: 'https://accessnepaltour.com/wp-content/uploads/2026/05/Shintamani-Resort.webp',
     description: 'Warm stone mountain lodge built in classic Himalayan style with cozy wood heating, warm blankets, and organic local meals.',
     facilities: ['Wi-Fi', 'Parking', 'Restaurant', 'Breakfast'],
     rooms: [

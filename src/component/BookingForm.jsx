@@ -3,6 +3,7 @@ import { Calendar, User, Mail, Phone, Users, CheckCircle2, MessageSquare } from 
 import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { addBooking } from '@/lib/storage';
+import { supabase } from '../supabaseClient';
 
 export default function BookingForm({ initialService = null, isOpen, onClose }) {
   const [formData, setFormData] = useState({
