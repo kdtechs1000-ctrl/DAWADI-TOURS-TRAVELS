@@ -9,21 +9,13 @@ export default function MyBookings() {
   const [cancelTargetId, setCancelTargetId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Safely format UTC string into Kathmandu Timezone
+  // Format the stored timestamp cleanly as local time
   const formatKathmanduTime = (dateStr) => {
     if (!dateStr) return 'Recently booked';
     try {
-      // 1. Convert space separator to ISO standard 'T'
-      let isoString = String(dateStr).trim().replace(' ', 'T');
-
-      // 2. Append 'Z' to treat as UTC if offset marker is absent
-      if (!isoString.endsWith('Z') && !isoString.includes('+')) {
-        isoString += 'Z';
-      }
-
-      // 3. Format into local Kathmandu time (+5:45)
-      return new Date(isoString).toLocaleString('en-US', {
-        timeZone: 'Asia/Kathmandu',
+      const cleanStr = String(dateStr).trim().replace(' ', 'T').replace('Z', '').replace(/\+\d{2}:\d{2}$/, '');
+      const date = new Date(cleanStr);
+      return date.toLocaleString('en-US', {
         dateStyle: 'medium',
         timeStyle: 'short',
       });
@@ -32,32 +24,31 @@ export default function MyBookings() {
     }
   };
 
-  // Fetch bookings and merge localStorage with Supabase
   const fetchBookings = async () => {
     setLoading(true);
-
     const localData = JSON.parse(localStorage.getItem('saved_bookings') || '[]');
     if (localData.length > 0) {
       setBookingList(localData);
     }
 
     try {
-      const { data: supabaseData, error } = await supabase
-        .from('bookings')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: { user } } = await supabase.auth.getUser();
+
+      let query = supabase.from('bookings').select('*').order('created_at', { ascending: false });
+
+      if (user) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { data: supabaseData, error } = await query;
 
       if (error) throw error;
 
       if (supabaseData) {
         const combinedMap = new Map();
-
-        // Remote records first
         supabaseData.forEach((item) => {
           if (item.id) combinedMap.set(String(item.id), item);
         });
-
-        // Retain local records if not yet deleted
         localData.forEach((item) => {
           if (item.id && !combinedMap.has(String(item.id))) {
             combinedMap.set(String(item.id), item);
@@ -69,7 +60,7 @@ export default function MyBookings() {
         localStorage.setItem('saved_bookings', JSON.stringify(mergedList));
       }
     } catch (err) {
-      console.error('Supabase fetch failed, relying on local storage:', err.message);
+      console.warn('Using local storage fallback:', err.message);
       setBookingList(localData);
     } finally {
       setLoading(false);
@@ -84,12 +75,7 @@ export default function MyBookings() {
     if (!cancelTargetId) return;
 
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .eq('id', cancelTargetId);
-
-      if (error) console.warn('Supabase record delete error:', error.message);
+      await supabase.from('bookings').delete().eq('id', cancelTargetId);
 
       const updatedList = bookingList.filter((b) => String(b.id) !== String(cancelTargetId));
       setBookingList(updatedList);
@@ -173,7 +159,6 @@ export default function MyBookings() {
         </div>
       )}
 
-      {/* Confirmation Modal */}
       {cancelTargetId && (
         <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 shadow-xl border border-slate-200 relative">
