@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { adventures } from '@/data/adventures';
-import { MapPin, Clock, Shield, Check } from 'lucide-react';
+import { MapPin, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import BookingForm from '@/component/BookingForm';
@@ -42,8 +42,12 @@ export default function AdventureDetails() {
               <Shield className="h-4 w-4 text-amber-700" />
               Safety & Requirements
             </h4>
-            <p className="text-xs text-amber-800"><strong>Safety:</strong> {adv.safetyInfo}</p>
-            <p className="text-xs text-amber-800"><strong>Requirements:</strong> {adv.requirements}</p>
+            <p className="text-xs text-amber-800">
+              <strong>Safety:</strong> {adv.safetyInfo}
+            </p>
+            <p className="text-xs text-amber-800">
+              <strong>Requirements:</strong> {adv.requirements}
+            </p>
           </div>
         </div>
 

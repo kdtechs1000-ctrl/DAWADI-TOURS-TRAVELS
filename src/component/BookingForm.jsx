@@ -44,11 +44,15 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
     setLoading(true);
 
     try {
-      // 1. Insert into Supabase database
+      // 1. Check if a user is currently logged in (returns null if guest)
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // 2. Insert into Supabase database (attaches user.id if logged in, otherwise null)
       const { data, error } = await supabase
         .from('bookings')
         .insert([
           {
+            user_id: user ? user.id : null,
             full_name: formData.fullName,
             email_address: formData.email,
             package_service: formData.serviceName,
@@ -59,14 +63,14 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
 
       if (error) throw error;
 
-      // 2. Save a copy to LocalStorage for offline/local access
+      // 3. Save a copy to LocalStorage for offline/local access
       const existingLocalBookings = JSON.parse(
         localStorage.getItem('saved_bookings') || '[]'
       );
       const updatedLocalBookings = [data, ...existingLocalBookings];
       localStorage.setItem('saved_bookings', JSON.stringify(updatedLocalBookings));
 
-      // 3. Set UI state for confirmation screen
+      // 4. Set UI state for confirmation screen
       setConfirmedBooking({
         id: data.id,
         fullName: data.full_name,

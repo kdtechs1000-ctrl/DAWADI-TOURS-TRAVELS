@@ -16,6 +16,8 @@ import Contact from '@/pages/Contact';
 import MyBookings from '@/pages/MyBookings';
 import NotFound from '@/pages/NotFound';
 import AdminPage from '@/pages/AdminPage';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 export default function App() {
   return (
@@ -39,8 +41,9 @@ export default function App() {
             
             {/* Admin Route */}
             <Route path="/admin" element={<AdminPage />} />
-
             <Route path="*" element={<NotFound />} />
+            <Route path="/terms" element={<Terms />} />
+             <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </main>
         <Footer />

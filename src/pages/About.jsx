@@ -84,15 +84,15 @@ export default function About() {
       {/* Stats Section */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-emerald-50 rounded-3xl p-8 text-center border border-emerald-100">
         <div>
-          <h3 className="text-3xl sm:text-4xl font-black text-emerald-800">10k+</h3>
+          <h3 className="text-3xl sm:text-4xl font-black text-emerald-800">20k+</h3>
           <p className="text-xs sm:text-sm text-emerald-700 font-medium mt-1">Happy Travelers</p>
         </div>
         <div>
-          <h3 className="text-3xl sm:text-4xl font-black text-emerald-800">50+</h3>
+          <h3 className="text-3xl sm:text-4xl font-black text-emerald-800">15+</h3>
           <p className="text-xs sm:text-sm text-emerald-700 font-medium mt-1">Tour Packages</p>
         </div>
         <div>
-          <h3 className="text-3xl sm:text-4xl font-black text-emerald-800">15+</h3>
+          <h3 className="text-3xl sm:text-4xl font-black text-emerald-800">10+</h3>
           <p className="text-xs sm:text-sm text-emerald-700 font-medium mt-1">Years Experience</p>
         </div>
         <div>

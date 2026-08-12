@@ -4,23 +4,23 @@ import { Facebook, Instagram, Youtube, MessageCircle, Phone, Mail, MapPin } from
 
 export default function Footer() {
 
-  const whatsappNumber = '9779803619762';
+  const whatsappNumber = '9779800000000';
   const whatsappMessage = encodeURIComponent('Hello! I would like to inquire about a tour package with Dawadi Tours.');
 
   const socialLinks = [
     { 
       icon: Facebook, 
-      href: 'https://facebook.com', 
+      href: 'https://www.facebook.com/login', 
       label: 'Facebook' 
     },
     { 
       icon: Instagram, 
-      href: 'https://instagram.com', 
+      href: 'https://www.instagram.com/accounts/login/', 
       label: 'Instagram' 
     },
     { 
       icon: Youtube, 
-      href: 'https://youtube.com', 
+      href: 'https://www.youtube.com', 
       label: 'YouTube' 
     },
     { 
@@ -115,7 +115,7 @@ export default function Footer() {
             <ul className="space-y-3 text-xs">
               <li className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
-                <span>Kathmandu, Nepal</span>
+                <span>Purano Naikap, Ward 13, Kathmandu, Nepal</span>
               </li>
               <li>
                 <a 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { hotels } from '@/data/hotels';
-import { MapPin, Star, Wifi, Coffee, Check } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import BookingForm from '@/component/BookingForm';
