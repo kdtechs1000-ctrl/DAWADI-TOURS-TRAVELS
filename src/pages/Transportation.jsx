@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import VehicleCard from "@/component/VehicleCard";
-import BookingForm from "@/component/BookingForm";
+import BookingModal from "@/component/BookingModal";
 import { vehicles } from '@/data/vehicles';
 
 export default function Transportation() {
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleBookNow = (veh) => {
-    setSelectedVehicle(veh);
-    setIsBookingOpen(true);
+    setSelectedService(veh.name || veh.title || 'Vehicle Rental');
+    setIsModalOpen(true);
   };
 
   return (
@@ -25,7 +25,11 @@ export default function Transportation() {
         ))}
       </div>
 
-      <BookingForm initialService={selectedVehicle} isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
+      <BookingModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        serviceName={selectedService} 
+      />
     </div>
   );
 }

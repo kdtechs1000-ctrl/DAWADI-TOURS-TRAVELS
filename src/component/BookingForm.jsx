@@ -44,15 +44,16 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
     setLoading(true);
 
     try {
-      // 1. Check if a user is currently logged in (returns null if guest)
-      const { data: { user } } = await supabase.auth.getUser();
+      // 1. Get the current logged-in user session
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id || null;
 
-      // 2. Insert into Supabase database (attaches user.id if logged in, otherwise null)
+      // 2. Insert booking record into Supabase
       const { data, error } = await supabase
         .from('bookings')
         .insert([
           {
-            user_id: user ? user.id : null,
+            user_id: userId,
             full_name: formData.fullName,
             email_address: formData.email,
             package_service: formData.serviceName,
@@ -63,14 +64,14 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
 
       if (error) throw error;
 
-      // 3. Save a copy to LocalStorage for offline/local access
+      // 3. Save a local backup copy to LocalStorage
       const existingLocalBookings = JSON.parse(
         localStorage.getItem('saved_bookings') || '[]'
       );
       const updatedLocalBookings = [data, ...existingLocalBookings];
       localStorage.setItem('saved_bookings', JSON.stringify(updatedLocalBookings));
 
-      // 4. Set UI state for confirmation screen
+      // 4. Set confirmation state
       setConfirmedBooking({
         id: data.id,
         fullName: data.full_name,
@@ -111,7 +112,7 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
             <p><strong>Email:</strong> {confirmedBooking.email}</p>
             <p><strong>Service:</strong> {confirmedBooking.serviceName}</p>
           </div>
-          <Button onClick={handleDone} className="w-full mt-4">Close & View Bookings</Button>
+          <Button onClick={handleDone} className="w-full mt-4 cursor-pointer">Close & View Bookings</Button>
         </div>
       ) : (
         <div>
@@ -163,7 +164,7 @@ export default function BookingForm({ initialService = null, isOpen, onClose }) 
               {errors.serviceName && <p className="text-[10px] text-red-600 mt-1 font-semibold">{errors.serviceName}</p>}
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full h-11 text-sm font-bold mt-2 flex items-center justify-center gap-2">
+            <Button type="submit" disabled={loading} className="w-full h-11 text-sm font-bold mt-2 flex items-center justify-center gap-2 cursor-pointer bg-emerald-800 hover:bg-emerald-900 text-white">
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />

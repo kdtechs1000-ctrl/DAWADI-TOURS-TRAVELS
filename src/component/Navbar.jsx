@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Mountain, 
   Menu, 
+  X,
   Compass, 
   PhoneCall, 
   Home, 
@@ -11,89 +11,52 @@ import {
   MapPin, 
   Car, 
   Info, 
-  Briefcase 
+  Briefcase,
+  User,
+  LogOut,
+  Shield,
+  LogIn
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet } from '@/components/ui/sheet';
+import { supabase } from '@/lib/supabase';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
 
-  // Navigation items with custom active color themes for each route
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setDropdownOpen(false);
+    navigate('/');
+  };
+
+  const isAdmin = user?.email === 'admin1@dawadi.com';
+
   const navLinks = [
-    { 
-      name: 'Home', 
-      path: '/', 
-      icon: Home, 
-      activeBg: 'bg-emerald-50 text-emerald-800', 
-      iconColor: 'text-emerald-600', 
-      lineColor: 'bg-emerald-600' 
-    },
-    { 
-      name: 'Tours', 
-      path: '/tours', 
-      icon: Compass, 
-      activeBg: 'bg-blue-50 text-blue-800', 
-      iconColor: 'text-blue-600', 
-      lineColor: 'bg-blue-600' 
-    },
-    { 
-      name: 'Hotels', 
-      path: '/hotels', 
-      icon: Hotel, 
-      activeBg: 'bg-indigo-50 text-indigo-800', 
-      iconColor: 'text-indigo-600', 
-      lineColor: 'bg-indigo-600' 
-    },
-    { 
-      name: 'Adventures', 
-      path: '/adventures', 
-      icon: Sparkles, 
-      activeBg: 'bg-amber-50 text-amber-800', 
-      iconColor: 'text-amber-600', 
-      lineColor: 'bg-amber-600' 
-    },
-    { 
-      name: 'Destinations', 
-      path: '/destinations', 
-      icon: MapPin, 
-      activeBg: 'bg-rose-50 text-rose-800', 
-      iconColor: 'text-rose-600', 
-      lineColor: 'bg-rose-600' 
-    },
-    { 
-      name: 'Transportation', 
-      path: '/transportation', 
-      icon: Car, 
-      activeBg: 'bg-cyan-50 text-cyan-800', 
-      iconColor: 'text-cyan-600', 
-      lineColor: 'bg-cyan-600' 
-    },
-    { 
-      name: 'About Us', 
-      path: '/about', 
-      icon: Info, 
-      activeBg: 'bg-purple-50 text-purple-800', 
-      iconColor: 'text-purple-600', 
-      lineColor: 'bg-purple-600' 
-    },
-    { 
-      name: 'Contact', 
-      path: '/contact', 
-      icon: PhoneCall, 
-      activeBg: 'bg-teal-50 text-teal-800', 
-      iconColor: 'text-teal-600', 
-      lineColor: 'bg-teal-600' 
-    },
-    { 
-      name: 'My Bookings', 
-      path: '/my-bookings', 
-      icon: Briefcase, 
-      activeBg: 'bg-orange-50 text-orange-800', 
-      iconColor: 'text-orange-600', 
-      lineColor: 'bg-orange-600' 
-    },
+    { name: 'Home', path: '/', icon: Home, activeBg: 'bg-emerald-50 text-emerald-800', iconColor: 'text-emerald-600' },
+    { name: 'Tours', path: '/tours', icon: Compass, activeBg: 'bg-blue-50 text-blue-800', iconColor: 'text-blue-600' },
+    { name: 'Hotels', path: '/hotels', icon: Hotel, activeBg: 'bg-indigo-50 text-indigo-800', iconColor: 'text-indigo-600' },
+    { name: 'Adventures', path: '/adventures', icon: Sparkles, activeBg: 'bg-amber-50 text-amber-800', iconColor: 'text-amber-600' },
+    { name: 'Destinations', path: '/destinations', icon: MapPin, activeBg: 'bg-rose-50 text-rose-800', iconColor: 'text-rose-600' },
+    { name: 'Transport', path: '/transportation', icon: Car, activeBg: 'bg-cyan-50 text-cyan-800', iconColor: 'text-cyan-600' },
+    { name: 'About', path: '/about', icon: Info, activeBg: 'bg-purple-50 text-purple-800', iconColor: 'text-purple-600' },
+    { name: 'Contact', path: '/contact', icon: PhoneCall, activeBg: 'bg-teal-50 text-teal-800', iconColor: 'text-teal-600' },
+    { name: 'Bookings', path: '/my-bookings', icon: Briefcase, activeBg: 'bg-orange-50 text-orange-800', iconColor: 'text-orange-600' },
   ];
 
   const isActive = (path) => {
@@ -103,30 +66,37 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white/95 backdrop-blur-md transition-all">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 h-20 flex items-center justify-between gap-2">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white/95 backdrop-blur-md shadow-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-2">
         
         {/* Logo Section */}
         <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-          <div className="relative flex items-center justify-center h-11 w-11 rounded-2xl bg-gradient-to-tr from-emerald-950 via-emerald-800 to-emerald-600 text-white shadow-md shadow-emerald-900/15 group-hover:scale-105 transition-transform duration-300">
-            <Mountain className="h-5 w-5 stroke-[2.2] text-emerald-100 group-hover:-translate-y-0.5 transition-transform" />
-            <div className="absolute -bottom-1 -right-1 bg-amber-400 p-0.5 rounded-full text-slate-950 border-2 border-white shadow-xs">
-              <Compass className="h-2.5 w-2.5" />
-            </div>
+          <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0">
+            <svg 
+              viewBox="0 0 48 48" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="w-full h-full group-hover:scale-105 transition-transform duration-300 shadow-md shadow-emerald-900/15 rounded-xl"
+            >
+              <rect width="48" height="48" rx="12" className="fill-emerald-900" />
+              <path d="M12 33L22 17L28 26L32 20L38 33H12Z" className="fill-emerald-100" />
+              <path d="M22 33L28 23L34 33H22Z" className="fill-emerald-400" />
+              <circle cx="32" cy="15" r="3" className="fill-amber-400" />
+            </svg>
           </div>
           
-          <div className="flex flex-col whitespace-nowrap">
-            <span className="text-lg font-black tracking-tight text-emerald-950 group-hover:text-emerald-800 transition-colors leading-none">
+          <div className="flex flex-col">
+            <span className="text-sm sm:text-base font-black tracking-tight text-emerald-950 leading-none">
               DAWADI
             </span>
-            <span className="text-[9px] font-bold tracking-widest text-emerald-700 uppercase mt-0.5">
+            <span className="text-[7px] sm:text-[8px] font-bold tracking-widest text-emerald-700 uppercase mt-0.5">
               Tours & Travels
             </span>
           </div>
         </Link>
 
-        {/* Desktop Navigation - Forces Single-Line Layout */}
-        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 flex-nowrap overflow-x-auto no-scrollbar">
+        {/* Desktop / Tablet Navigation (Now shows from 'md' breakpoint onwards) */}
+        <nav className="hidden md:flex items-center gap-0.5 lg:gap-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const active = isActive(link.path);
@@ -134,86 +104,193 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`relative px-2.5 xl:px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 flex items-center gap-1.5 shrink-0 ${
+                className={`px-2 py-1.5 lg:px-2.5 lg:py-2 rounded-xl text-[11px] lg:text-xs font-bold transition-all duration-200 flex items-center gap-1 whitespace-nowrap ${
                   active
-                    ? `${link.activeBg} font-bold shadow-2xs`
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                    ? `${link.activeBg} shadow-2xs ring-1 ring-emerald-200/50`
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 ${active ? link.iconColor : 'text-slate-400'}`} />
+                <Icon className={`h-3 w-3 lg:h-3.5 lg:w-3.5 ${active ? link.iconColor : 'text-slate-400'}`} />
                 <span>{link.name}</span>
-                {active && (
-                  <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 ${link.lineColor} rounded-full`} />
-                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Right Action Button */}
-        <div className="hidden lg:flex items-center shrink-0">
-          <Link to="/tours">
-            <Button className="gap-1.5 bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-2xl px-4 xl:px-5 py-2 text-xs shadow-md shadow-emerald-900/10 transition-all hover:scale-[1.02] whitespace-nowrap">
-              <Compass className="h-4 w-4 text-emerald-300" />
-              Book Now
+        {/* Right Side: Auth / Dashboard Controller */}
+        <div className="hidden md:flex items-center gap-2 shrink-0">
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 px-3 py-2 rounded-xl text-xs font-bold text-emerald-900 transition-colors cursor-pointer"
+              >
+                <div className="bg-emerald-600 text-white p-1 rounded-full">
+                  <User className="h-3 w-3" />
+                </div>
+                <span className="max-w-[80px] lg:max-w-[100px] truncate">{user.email.split('@')[0]}</span>
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-50">
+                  <div className="px-4 py-2 border-b border-slate-100 text-[11px] text-slate-500 truncate">
+                    Signed in as <br /><span className="font-bold text-slate-800">{user.email}</span>
+                  </div>
+
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      <Shield className="h-3.5 w-3.5 text-emerald-600" /> Admin Dashboard
+                    </Link>
+                  )}
+
+                  <Link
+                    to="/my-bookings"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <Briefcase className="h-3.5 w-3.5 text-emerald-600" /> My Bookings
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 text-left border-t border-slate-100 cursor-pointer"
+                  >
+                    <LogOut className="h-3.5 w-3.5" /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Button
+              onClick={() => navigate('/login')}
+              className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-md shadow-emerald-900/10 transition-all hover:scale-[1.02]"
+            >
+              <LogIn className="h-3.5 w-3.5 text-emerald-200" /> Login / Sign Up
             </Button>
-          </Link>
+          )}
         </div>
 
-        {/* Mobile Hamburger Button */}
-        <div className="flex lg:hidden items-center gap-2">
+        {/* Mobile Hamburger Button (Shows only on small mobile screens below 'md') */}
+        <div className="flex md:hidden items-center gap-2">
           <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMobileMenuOpen(true);
+            }}
+            className="p-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer relative z-50"
             aria-label="Open Menu"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-6 w-6 pointer-events-none" />
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation */}
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <div className="flex flex-col gap-1 py-4">
-          <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Navigation</div>
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            const active = isActive(link.path);
-            return (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                  active
-                    ? `${link.activeBg} font-bold`
-                    : 'text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                <Icon className={`h-4 w-4 ${active ? link.iconColor : 'text-slate-400'}`} />
-                <span>{link.name}</span>
-              </Link>
-            );
-          })}
+      {/* Custom Native Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity" 
+            onClick={() => setMobileMenuOpen(false)}
+          />
           
-          <div className="pt-6 border-t border-slate-100 mt-4 px-2 space-y-4">
-            <Link to="/tours" onClick={() => setMobileMenuOpen(false)}>
-              <Button className="w-full h-12 text-sm bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl flex items-center justify-center gap-2">
-                <Compass className="h-4 w-4" />
-                Book Your Trip Now
-              </Button>
-            </Link>
+          {/* Drawer Content */}
+          <div className="relative w-[300px] sm:w-[350px] bg-white h-full shadow-2xl flex flex-col z-10">
             
-            <a 
-              href="tel:+9779800000000" 
-              className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-600 hover:text-emerald-800 py-2 transition-colors"
-            >
-              <PhoneCall className="h-4 w-4 text-emerald-700" />
-              +977 1 4250000 / 9800000000
-            </a>
+            {/* Header */}
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 shrink-0">
+                  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full rounded-lg shadow-sm">
+                    <rect width="48" height="48" rx="12" className="fill-emerald-900" />
+                    <path d="M12 33L22 17L28 26L32 20L38 33H12Z" className="fill-emerald-100" />
+                    <path d="M22 33L28 23L34 33H22Z" className="fill-emerald-400" />
+                    <circle cx="32" cy="15" r="3" className="fill-amber-400" />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-black tracking-tight text-emerald-950 leading-none">DAWADI</span>
+                  <span className="text-[7px] font-bold tracking-widest text-emerald-700 uppercase mt-0.5">Tours & Travels</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Links List */}
+            <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+              <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Menu</div>
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const active = isActive(link.path);
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                      active
+                        ? `${link.activeBg}`
+                        : 'text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 ${active ? link.iconColor : 'text-slate-400'}`} />
+                    <span>{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Footer / Auth Actions */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-3">
+              {user ? (
+                <div className="space-y-2">
+                  <div className="px-3 py-2 text-[11px] text-slate-500 bg-white border border-slate-200 rounded-xl">
+                    Signed in as <span className="font-bold text-slate-800 block truncate">{user.email}</span>
+                  </div>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full h-10 text-xs bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 mb-2">
+                        <Shield className="h-3.5 w-3.5" /> Admin Dashboard
+                      </Button>
+                    </Link>
+                  )}
+                  <Button 
+                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                    className="w-full h-10 text-xs bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <LogOut className="h-3.5 w-3.5" /> Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full h-10 text-xs bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                    <LogIn className="h-3.5 w-3.5 text-emerald-200" /> Login / Sign Up
+                  </Button>
+                </Link>
+              )}
+              
+              <a 
+                href="tel:+9779800000000" 
+                className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-600 hover:text-emerald-800 py-1 transition-colors"
+              >
+                <PhoneCall className="h-3.5 w-3.5 text-emerald-700" />
+                +977 9800000000
+              </a>
+            </div>
+
           </div>
         </div>
-      </Sheet>
+      )}
     </header>
   );
 }

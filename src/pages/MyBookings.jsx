@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, User, Mail, Trash2, Clock, Loader2, RefreshCw, X } from 'lucide-react';
+import { Calendar, User, Mail, Trash2, Clock, Loader2, RefreshCw, X, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabase';
@@ -26,18 +26,27 @@ export default function MyBookings() {
 
   const fetchBookings = async () => {
     setLoading(true);
-    const localData = JSON.parse(localStorage.getItem('saved_bookings') || '[]');
-    if (localData.length > 0) {
-      setBookingList(localData);
-    }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // 1. Get current authenticated user session
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
 
+      if (!user) {
+        // If logged out, fall back safely to empty list or local storage cache
+        setBookingList([]);
+        setLoading(false);
+        return;
+      }
+
+      const isAdmin = user.email === 'admin1@dawadi.com';
+
+      // 2. Build Supabase query
       let query = supabase.from('bookings').select('*').order('created_at', { ascending: false });
 
-      if (user) {
-        query = query.eq('user_id', user.id);
+      // 3. Strict filtering: Only query all if admin, otherwise restrict to own user_id or email
+      if (!isAdmin) {
+        query = query.or(`user_id.eq.${user.id},email_address.eq.${user.email}`);
       }
 
       const { data: supabaseData, error } = await query;
@@ -45,22 +54,16 @@ export default function MyBookings() {
       if (error) throw error;
 
       if (supabaseData) {
-        const combinedMap = new Map();
-        supabaseData.forEach((item) => {
-          if (item.id) combinedMap.set(String(item.id), item);
-        });
-        localData.forEach((item) => {
-          if (item.id && !combinedMap.has(String(item.id))) {
-            combinedMap.set(String(item.id), item);
-          }
-        });
-
-        const mergedList = Array.from(combinedMap.values());
-        setBookingList(mergedList);
-        localStorage.setItem('saved_bookings', JSON.stringify(mergedList));
+        setBookingList(supabaseData);
+        // Clear local storage cache sync to prevent cross-account contamination
+        if (!isAdmin) {
+          localStorage.setItem('saved_bookings', JSON.stringify(supabaseData));
+        }
       }
     } catch (err) {
-      console.warn('Using local storage fallback:', err.message);
+      console.warn('Error fetching bookings:', err.message);
+      // Fallback to local storage only if offline/error
+      const localData = JSON.parse(localStorage.getItem('saved_bookings') || '[]');
       setBookingList(localData);
     } finally {
       setLoading(false);
@@ -75,7 +78,8 @@ export default function MyBookings() {
     if (!cancelTargetId) return;
 
     try {
-      await supabase.from('bookings').delete().eq('id', cancelTargetId);
+      const { error } = await supabase.from('bookings').delete().eq('id', cancelTargetId);
+      if (error) throw error;
 
       const updatedList = bookingList.filter((b) => String(b.id) !== String(cancelTargetId));
       setBookingList(updatedList);

@@ -16,6 +16,7 @@ import Contact from '@/pages/Contact';
 import MyBookings from '@/pages/MyBookings';
 import NotFound from '@/pages/NotFound';
 import AdminPage from '@/pages/AdminPage';
+import Login from '@/pages/Login';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
@@ -38,12 +39,13 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/my-bookings" element={<MyBookings />} />
+            <Route path="/login" element={<Login />} />
             
             {/* Admin Route */}
             <Route path="/admin" element={<AdminPage />} />
-            <Route path="*" element={<NotFound />} />
             <Route path="/terms" element={<Terms />} />
-             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
         <Footer />

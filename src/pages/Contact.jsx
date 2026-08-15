@@ -127,7 +127,7 @@ export default function Contact() {
               </p>
               <Button
                 onClick={() => setSubmitted(false)}
-                className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl px-6 py-2.5"
+                className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl px-6 py-2.5 cursor-pointer"
               >
                 Send Another Message
               </Button>
