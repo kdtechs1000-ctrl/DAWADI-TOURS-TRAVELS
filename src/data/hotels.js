@@ -256,7 +256,7 @@ export const hotels = [
     title: 'Danse Sanctuary Rara Lake Resort',
     name: 'Danse Sanctuary Rara Lake Resort',
     location: 'Rara Lake',
-    category: 'mugu', // Fixed from pokhara to rara
+    category: 'mugu', 
     starRating: 3,
     rating: 4.6,
     guestRating: 4.6,
