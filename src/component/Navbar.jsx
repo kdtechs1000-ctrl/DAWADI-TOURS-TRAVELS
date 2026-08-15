@@ -45,7 +45,9 @@ export default function Navbar() {
     navigate('/');
   };
 
-  const isAdmin = user?.email === 'admin1@dawadi.com';
+  // Secure admin check using environment variable
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+  const isAdmin = user?.email && adminEmail && user.email === adminEmail;
 
   const navLinks = [
     { name: 'Home', path: '/', icon: Home, activeBg: 'bg-emerald-50 text-emerald-800', iconColor: 'text-emerald-600' },
@@ -95,7 +97,7 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop / Tablet Navigation (Now shows from 'md' breakpoint onwards) */}
+        {/* Desktop / Tablet Navigation */}
         <nav className="hidden md:flex items-center gap-0.5 lg:gap-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
@@ -174,7 +176,7 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Hamburger Button (Shows only on small mobile screens below 'md') */}
+        {/* Mobile Hamburger Button */}
         <div className="flex md:hidden items-center gap-2">
           <button
             type="button"
@@ -190,23 +192,23 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Custom Native Mobile Drawer */}
+      {/* Improved Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity" 
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity" 
             onClick={() => setMobileMenuOpen(false)}
           />
           
           {/* Drawer Content */}
-          <div className="relative w-[300px] sm:w-[350px] bg-white h-full shadow-2xl flex flex-col z-10">
+          <div className="relative w-[85%] max-w-[340px] bg-white h-full shadow-2xl flex flex-col z-10">
             
             {/* Header */}
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 shrink-0">
-                  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full rounded-lg shadow-sm">
+                <div className="w-9 h-9 shrink-0">
+                  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full rounded-xl shadow-sm">
                     <rect width="48" height="48" rx="12" className="fill-emerald-900" />
                     <path d="M12 33L22 17L28 26L32 20L38 33H12Z" className="fill-emerald-100" />
                     <path d="M22 33L28 23L34 33H22Z" className="fill-emerald-400" />
@@ -214,21 +216,22 @@ export default function Navbar() {
                   </svg>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-black tracking-tight text-emerald-950 leading-none">DAWADI</span>
-                  <span className="text-[7px] font-bold tracking-widest text-emerald-700 uppercase mt-0.5">Tours & Travels</span>
+                  <span className="text-base font-black tracking-tight text-emerald-950 leading-none">DAWADI</span>
+                  <span className="text-[9px] font-bold tracking-widest text-emerald-700 uppercase mt-1">Tours & Travels</span>
                 </div>
               </div>
               <button 
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-2.5 rounded-xl text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer"
+                aria-label="Close Menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-6 w-6" />
               </button>
             </div>
 
-            {/* Links List */}
-            <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
-              <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Menu</div>
+            {/* Links List with proper sizing and padding */}
+            <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1.5">
+              <div className="px-3 py-1 text-xs font-extrabold text-slate-400 uppercase tracking-wider">Navigation</div>
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const active = isActive(link.path);
@@ -237,13 +240,13 @@ export default function Navbar() {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                    className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
                       active
                         ? `${link.activeBg}`
                         : 'text-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${active ? link.iconColor : 'text-slate-400'}`} />
+                    <Icon className={`h-5 w-5 ${active ? link.iconColor : 'text-slate-400'}`} />
                     <span>{link.name}</span>
                   </Link>
                 );
@@ -251,39 +254,39 @@ export default function Navbar() {
             </div>
 
             {/* Footer / Auth Actions */}
-            <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-3">
+            <div className="p-5 border-t border-slate-100 bg-slate-50 shrink-0 space-y-3">
               {user ? (
-                <div className="space-y-2">
-                  <div className="px-3 py-2 text-[11px] text-slate-500 bg-white border border-slate-200 rounded-xl">
-                    Signed in as <span className="font-bold text-slate-800 block truncate">{user.email}</span>
+                <div className="space-y-2.5">
+                  <div className="px-3.5 py-2.5 text-xs text-slate-600 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                    Signed in as <span className="font-bold text-slate-900 block truncate mt-0.5">{user.email}</span>
                   </div>
                   {isAdmin && (
                     <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full h-10 text-xs bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 mb-2">
-                        <Shield className="h-3.5 w-3.5" /> Admin Dashboard
+                      <Button className="w-full h-11 text-sm bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                        <Shield className="h-4 w-4" /> Admin Dashboard
                       </Button>
                     </Link>
                   )}
                   <Button 
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="w-full h-10 text-xs bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full h-11 text-sm bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                   >
-                    <LogOut className="h-3.5 w-3.5" /> Logout
+                    <LogOut className="h-4 w-4" /> Logout
                   </Button>
                 </div>
               ) : (
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full h-10 text-xs bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                    <LogIn className="h-3.5 w-3.5 text-emerald-200" /> Login / Sign Up
+                  <Button className="w-full h-12 text-sm bg-emerald-800 hover:bg-emerald-900 text-white font-bold rounded-xl flex items-center justify-center gap-2.5 cursor-pointer shadow-md">
+                    <LogIn className="h-4 w-4 text-emerald-200" /> Login / Sign Up
                   </Button>
                 </Link>
               )}
               
               <a 
                 href="tel:+9779800000000" 
-                className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-600 hover:text-emerald-800 py-1 transition-colors"
+                className="flex items-center justify-center gap-2 text-xs font-bold text-slate-600 hover:text-emerald-800 py-1.5 transition-colors"
               >
-                <PhoneCall className="h-3.5 w-3.5 text-emerald-700" />
+                <PhoneCall className="h-4 w-4 text-emerald-700" />
                 +977 9800000000
               </a>
             </div>
